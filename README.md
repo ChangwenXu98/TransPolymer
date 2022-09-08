@@ -20,6 +20,7 @@ $ conda activate TransPolymer
 # install requirements
 $ conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 $ pip install transformers
+$ pip install PyYAML
 $ conda install -c conda-forge rdkit=2022.3.5
 $ conda install -c conda-forge tensorboard
 $ conda install -c conda-forge torchmetrics

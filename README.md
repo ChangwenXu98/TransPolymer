@@ -31,7 +31,7 @@ $ git clone https://github.com/ChangwenXu98/TransPolymer.git
 $ cd TransPolymer
 ```
 
-## Datasets
+## Dataset
 
 The pretraining dataset is adopted from the paper ["PI1M: A Benchmark Database for Polymer Informatics"](https://pubs.acs.org/doi/10.1021/acs.jcim.0c00726). Data augmentation is applied by augmenting each sequence to five.
 
@@ -46,6 +46,10 @@ Egc, Xc, EPS, Ei, Nc: ["Polymer informatics with multi-task learning"](https://w
 OPV: ["Computer-Aided Screening of Conjugated Polymers for Organic Solar Cell: Classification by Random Forest"](https://pubs.acs.org/doi/10.1021/acs.jpclett.8b00635)
 
 The processed datasets will be made public as soon as the paper is published.
+
+## Pretrain
+To pretrain TransPolymer, where the configurations and detailed explaination for each variable can be found in `config.yaml`.
+
 
 ## Codes
 

@@ -60,14 +60,14 @@ The processed datasets will be made public as soon as the paper is published.
 ### Tokenization
 `PolymerSmilesTokenization.py` is adapted from RobertaTokenizer from [huggingface](https://github.com/huggingface/transformers/tree/v4.21.2) with a specially designed regular expression for tokenization with chemical awareness.
 
-### Pretrain
+### Pretraining
 To pretrain TransPolymer, where the configurations and detailed explaination for each variable can be found in `config.yaml`.
 ```
 $ python -m torch.distributed.launch --nproc_per_node=2 Pretrain.py
 ```
 <em>DistributedDataParallel</em> is used for faster pretraining. The pretrained model can be found in `ckpt/pretrain.pt`
 
-### Finetune
+### Finetuning
 To finetune the pretrained TransPolymer on different downstream benchmarks about polymer properties, where the configurations and detailed explaination for each variable can be found in `config_finetune.yaml`.
 ```
 $ python finetune.py

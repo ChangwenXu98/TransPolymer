@@ -4,6 +4,8 @@
 [Changwen Xu](https://github.com/ChangwenXu98), [Yuyang Wang](https://yuyangw.github.io/), [Amir Barati Farimani](https://www.meche.engineering.cmu.edu/directory/bios/barati-farimani-amir.html) </br>
 Carnegie Mellon University </br>
 
+<img src="figs/pipeline.png" width="500">
+
 This is the official implementation of <strong><em>TransPolymer</em></strong>: "TransPolymer: a Transformer-based Language Model for Polymer Property Predictions". In this work, we introduce TransPolymer, a Transformer-based language model, for representation learning of polymer sequences by pretraining on a large unlabeled dataset (~5M unique sequences) via self-supervised masked language modeling and making accurate and efficient predictions of polymer properties in downstream tasks by finetuning. If you find our work useful in your research, please cite:
 ```
 @article{xu2022transpolymer,

@@ -4,7 +4,15 @@
 [Changwen Xu](https://github.com/ChangwenXu98), [Yuyang Wang](https://yuyangw.github.io/), [Amir Barati Farimani](https://www.meche.engineering.cmu.edu/directory/bios/barati-farimani-amir.html) </br>
 Carnegie Mellon University </br>
 
-This is the official implementation of <strong><em>TransPolymer</em></strong>: "TransPolymer: a Transformer-based Language Model for Polymer Property Predictions". In this work, we introduce TransPolymer, a Transformer-based language model, for representation learning of polymer sequences by pretraining on a large unlabeled dataset (~5M unique sequences) via self-supervised masked language modeling and making accurate and efficient predictions of polymer properties in downstream tasks by finetuning. 
+This is the official implementation of <strong><em>TransPolymer</em></strong>: "TransPolymer: a Transformer-based Language Model for Polymer Property Predictions". In this work, we introduce TransPolymer, a Transformer-based language model, for representation learning of polymer sequences by pretraining on a large unlabeled dataset (~5M unique sequences) via self-supervised masked language modeling and making accurate and efficient predictions of polymer properties in downstream tasks by finetuning. If you find our work useful in your research, please cite:
+```
+@article{xu2022transpolymer,
+  title={TransPolymer: a Transformer-based Language Model for Polymer Property Predictions},
+  author={Xu, Changwen and Wang, Yuyang and Farimani, Amir Barati},
+  journal={arXiv preprint arXiv:2209.01307},
+  year={2022}
+}
+```
 
 ## Getting Started
 
@@ -31,7 +39,7 @@ $ git clone https://github.com/ChangwenXu98/TransPolymer.git
 $ cd TransPolymer
 ```
 
-## Dataset
+### Dataset
 
 The pretraining dataset is adopted from the paper ["PI1M: A Benchmark Database for Polymer Informatics"](https://pubs.acs.org/doi/10.1021/acs.jcim.0c00726). Data augmentation is applied by augmenting each sequence to five.
 
@@ -47,10 +55,33 @@ OPV: ["Computer-Aided Screening of Conjugated Polymers for Organic Solar Cell: C
 
 The processed datasets will be made public as soon as the paper is published.
 
-## Pretrain
+### Tokenization
+`PolymerSmilesTokenization.py` is adapted from RobertaTokenizer from [huggingface](https://github.com/huggingface/transformers/tree/v4.21.2) with a specially designed regular expression for tokenization with chemical awareness.
+
+### Pretrain
 To pretrain TransPolymer, where the configurations and detailed explaination for each variable can be found in `config.yaml`.
+```
+$ python -m torch.distributed.launch --nproc_per_node=2 Pretrain.py
+```
+<em>DistributedDataParallel</em> is used for faster pretraining. The pretrained model can be found in `ckpt/pretrain.pt`
 
+### Finetune
+To finetune the pretrained TransPolymer on different downstream benchmarks about polymer properties, where the configurations and detailed explaination for each variable can be found in `config_finetune.yaml`.
+```
+$ python finetune.py
+```
 
-## Codes
+### Attention Visualization
+To visualize the attention scores for interpretability of pretraining and finetuning phases, where the configurations and detailed explaination for each variable can be found in `config_attention.yaml`.
+```
+$ python Attention_vis.py
+```
 
-The codes used for pretraining, finetuning, and visualization are included in the archive. `PolymerSmilesTokenization.py` is adapted from RobertaTokenizer from [huggingface](https://github.com/huggingface/transformers/tree/v4.21.2) with a specially designed regular expression for tokenization with chemical awareness. `Pretrain.py` is used for pretraining. `Downstream_train_test_split.py` is used for finetuning on PE-I dataset which adopts a train-test split, and `Downstream_with_aug.py` is used for the other datasets except PE-II which use cross-validation. `Downstream_with_aug_special.py` is specially for PE-II which also uses cross-validation but the data augmentation function is more complex due to the copolymers contained in the dataset. Correspondingly, `Predict_vs_true.py`, `Predict_vs_true_aug.py`, and `Predict_vs_true_special.py` are used to draw plots of ground truth vs. predicted value for the downstream tasks, respectively. `Attention_vis_pretrain.py` is used for attention visualization of pretrained TransPolymer, and `Attention_vis_pred.py` is used for visualizing the determinant tokens in polymer sequences on prediction results. `Obtain_Embedding.py` is used for extracting TransPolymer embeddings from sequences and apply max pooling on them as input of t-SNE, and t-SNE visualization is achieved by `tSNE.py`. The plots of length distributions of polymer sequences in downstream datasets before data augmentation are drawn by `length_dist.py`.
+### t-SNE Visualization
+To visualize the chemical space covered by each dataset, where the configurations and detailed explaination for each variable can be found in `config_tSNE.yaml`.
+```
+$ python tSNE.py
+```
+
+## Acknowledgement
+- PyTorch implementation of Transformer: [https://github.com/huggingface/transformers.git](https://github.com/huggingface/transformers.git)

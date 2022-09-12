@@ -31,6 +31,7 @@ $ conda activate TransPolymer
 $ conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 $ pip install transformers
 $ pip install PyYAML
+$ pip install fairscale
 $ conda install -c conda-forge rdkit=2022.3.5
 $ conda install -c conda-forge scikit-learn
 $ conda install -c conda-forge tensorboard

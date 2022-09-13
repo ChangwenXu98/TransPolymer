@@ -30,13 +30,13 @@ $ conda activate TransPolymer
 # install requirements
 $ conda install pytorch==1.12.0 torchvision torchaudio cudatoolkit=11.3 -c pytorch
 $ pip install transformers==4.20.1
-$ pip install PyYAML
-$ pip install fairscale
-$ conda install -c conda-forge rdkit=2022.3.5
-$ conda install -c conda-forge scikit-learn
-$ conda install -c conda-forge tensorboard
-$ conda install -c conda-forge torchmetrics
-$ conda install -c conda-forge packaging
+$ pip install PyYAML==6.0
+$ pip install fairscale==0.4.6
+$ conda install -c conda-forge rdkit=2022.3.4
+$ conda install -c conda-forge scikit-learn==0.24.2
+$ conda install -c conda-forge tensorboard==2.9.1
+$ conda install -c conda-forge torchmetrics==0.9.2
+$ conda install -c conda-forge packaging==21.0
 
 # clone the source code of TransPolymer
 $ git clone https://github.com/ChangwenXu98/TransPolymer.git

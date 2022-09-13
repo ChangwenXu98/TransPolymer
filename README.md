@@ -24,7 +24,7 @@ Set up conda environment and clone the github repo
 
 ```
 # create a new environment
-$ conda create --name TransPolymer python=3.7
+$ conda create --name TransPolymer python=3.9
 $ conda activate TransPolymer
 
 # install requirements

@@ -28,7 +28,7 @@ $ conda create --name TransPolymer python=3.7
 $ conda activate TransPolymer
 
 # install requirements
-$ conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+$ conda install pytorch==1.12.0 torchvision torchaudio cudatoolkit=11.3 -c pytorch
 $ pip install transformers==4.20.1
 $ pip install PyYAML
 $ pip install fairscale

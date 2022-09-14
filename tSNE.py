@@ -16,7 +16,7 @@ from transformers import AdamW, get_linear_schedule_with_warmup, RobertaModel, R
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, multilabel_confusion_matrix
 from sklearn.preprocessing import StandardScaler
-from sklearn.manifold import TSNE
+from openTSNE import TSNE
 
 import seaborn as sns
 from pylab import rcParams

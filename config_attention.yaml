@@ -1,19 +1,18 @@
-"""Indicators"""
-task: 'pretrain'                                       # the task to visualize the attention scores
-smiles: '*CCO*'                                        # the SMILES used for visualization when task=='pretrain'
-index: 8                                               # the index of the sequence used for visualization when task=='finetune'
-add_vocab_flag: True                                   # whether to add supplementary vocab
+task: 'pretrain'                                      # the task to visualize the attention scores
+smiles: '*CCO*'                                       # the SMILES used for visualization when task=='pretrain'
+layer: 0                                              # the hidden layer for visualization when task=='pretrain'
+index: 8                                              # the index of the sequence used for visualization when task=='finetune'
+add_vocab_flag: False                                 # whether to add supplementary vocab
 
-"""Model and file path"""
-file_path: 'data/train_PE_I.csv'                       # train file path
-vocab_sup_file: 'data/vocab_sup_PE_I.csv'              # supplementary vocab file path
-model_path: 'ckpt/PE_I_best_model.pt'                  # finetuned model path
-pretrain_path: 'ckpt/pretrain.pt'                      # pretrained model path
-blocksize: 411                                         # max length of sequences after tokenization
+file_path: 'data/PE_II.csv'                           # train file path
+vocab_sup_file: 'data/vocab_sup_PE_II.csv'            # supplementary vocab file path
+model_path: 'ckpt/PE_II_best_model.pt'                # finetuned model path
+pretrain_path: 'ckpt/pretrain.pt'                     # pretrained model path
+save_path: 'figs/attention_vis.png'                   # figure save path
+blocksize: 7                                          # max length of sequences after tokenization
 
-"""Figure parameters"""
-figsize_x: 30                                          # the size of figure in x
-figsize_y: 18                                          # the size of figure in y
-fontsize: 20                                           # fontsize
-labelsize: 15                                          # label size
-rotation: 45                                           # rotation of figure
+figsize_x: 30                                         # the size of figure in x
+figsize_y: 18                                         # the size of figure in y
+fontsize: 20                                          # fontsize
+labelsize: 15                                         # label size
+rotation: 45                                          # rotation of figure

@@ -4,12 +4,16 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 from torch.utils.tensorboard import SummaryWriter
 from tensorboard import program
 import sys
 import os
 import yaml
+from rdkit import Chem
+from copy import deepcopy
+from packaging import version
 
 """Import PolymerSmilesTokenizer from PolymerSmilesTokenization.py"""
 from PolymerSmilesTokenization import PolymerSmilesTokenizer
@@ -18,7 +22,6 @@ from PolymerSmilesTokenization import PolymerSmilesTokenizer
 class LoadPretrainData(Dataset):
     def __init__(self, tokenizer, dataset, blocksize):
         self.tokenizer = tokenizer
-        self.file_path = file_path
         self.blocksize = blocksize
         self.dataset = dataset
 
@@ -228,7 +231,7 @@ class DataAugmentation:
             n_atoms_list = [nat for nat in range(n_atoms)]
             if n_atoms != 0:
                 for iatoms in range(n_atoms):
-                    n_atoms_list_tmp = rotate_atoms(n_atoms_list, iatoms)  # rotate atoms' index
+                    n_atoms_list_tmp = self.rotate_atoms(n_atoms_list, iatoms)  # rotate atoms' index
                     nmol = Chem.RenumberAtoms(mol, n_atoms_list_tmp)  # renumber atoms in mol
                     try:
                         smiles = Chem.MolToSmiles(nmol,
@@ -271,7 +274,7 @@ class DataAugmentation:
         for i in range(df.shape[0]):
             smiles = df.iloc[i, 0]
             prop = df.iloc[i, 1:]
-            smiles_array = generate_smiles(smiles)
+            smiles_array = self.generate_smiles(smiles)
             if 'None' not in smiles_array:
                 prop = np.tile(prop, (len(smiles_array), 1))
                 data_new = np.hstack((smiles_array, prop))
@@ -295,7 +298,7 @@ class DataAugmentation:
             else:
                 smiles = df.iloc[i, 0]
                 prop = df.iloc[i, 1:]
-                smiles_array = generate_smiles(smiles)
+                smiles_array = self.generate_smiles(smiles)
                 if 'None' not in smiles_array:
                     prop = np.tile(prop, (len(smiles_array), 1))
                     data_new = np.hstack((smiles_array, prop))

@@ -1,10 +1,8 @@
-"""Data path"""
 file_path: 'data/pretrain.csv'          # pretrain data path
 
-"""Training arguments"""
 epochs: 30                              # total number of epochs
 batch_size: 100                         # batch size
-lr_rate: 5e-5                           # learning rate
+lr_rate: 0.00005                        # learning rate
 scheduler_type: 'linear'                # scheduler type
 weight_decay: 0.0                       # weight decay for AdamW
 warmup_ratio: 0.05                      # warm-up ratio for scheduler
@@ -19,7 +17,6 @@ dataloader_num_workers: 18              # Number of subprocesses to use for data
 sharded_ddp: 'simple'                   # option of Sharded DDP training
 save_path: 'ckpt/pretrain.pt'           # logging and save path of the pretrained model
 
-"""TransPolymer parameters"""
 max_position_embeddings: 514            # max position embeddings of Transformer
 blocksize: 175                          # max length of sequences after tokenization
 num_attention_heads: 12                 # number of attention heads in each hidden layer

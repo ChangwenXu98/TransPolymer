@@ -47,7 +47,7 @@ def main(pretrain_config):
     model = RobertaForMaskedLM(config=config).to(device)
 
     """Load Data"""
-    train_data, valid_data = split(file_path)
+    train_data, valid_data = split(pretrain_config['file_path'])
     data_train = LoadPretrainData(tokenizer=tokenizer, dataset=train_data, blocksize=pretrain_config['blocksize'])
     data_valid = LoadPretrainData(tokenizer=tokenizer, dataset=valid_data, blocksize=pretrain_config['blocksize'])
 

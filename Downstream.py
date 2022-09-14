@@ -18,7 +18,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import KFold
 from rdkit import Chem
 
-import seaborn as sns
 from pylab import rcParams
 import matplotlib.pyplot as plt
 from matplotlib import rc
@@ -142,9 +141,9 @@ def train(model, optimizer, scheduler, loss_fn, train_dataloader, device):
         optimizer.step()
         scheduler.step()
 
-    return model
+    return None
 
-def test(model, loss_fn, train_dataloader, test_dataloader, device, scaler, best_test_r2, best_r2, epoch):
+def test(model, loss_fn, train_dataloader, test_dataloader, device, scaler, train_loss_best, test_loss_best, best_train_r2, best_test_r2, best_r2, optimizer, scheduler, epoch):
 
     r2score = R2Score()
     train_loss = 0
@@ -211,7 +210,7 @@ def test(model, loss_fn, train_dataloader, test_dataloader, device, scaler, best
         best_r2 = r2_test
         torch.save(state, finetune_config['best_model_path'])         # save the best model
 
-    if count >= tolerance:
+    if count >= finetune_config['tolerance']:
         print("Early stop")
         if best_test_r2 == 0:
             print("Poor performance with negative r^2")
@@ -228,29 +227,92 @@ def main(finetune_config):
         vocab_sup = pd.read_csv(finetune_config['vocab_sup_file'], header=None).values.flatten().tolist()
         tokenizer.add_tokens(vocab_sup)
 
-    """K-fold"""
-    splits = KFold(n_splits=finetune_config['k'], shuffle=True, random_state=1)       # k=1 for train-test split and k=5 for cross validation
+    best_r2 = 0.0           # monitor the best r^2 in the run
 
     """Data"""
     if finetune_config['CV_flag']:
         data = pd.read_csv(finetune_config['train_file'])
-    else:
-        data = pd.read_csv(finetune_config['train_file'])
+        """K-fold"""
+        splits = KFold(n_splits=finetune_config['k'], shuffle=True,
+                       random_state=1)  # k=1 for train-test split and k=5 for cross validation
+        train_loss_avg, test_loss_avg, train_r2_avg, test_r2_avg = [], [], [], []     # monitor the best metrics in each fold
+        for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(data.shape[0]))):
+            print('Fold {}'.format(fold + 1))
 
-    """Train the model"""
-
-    best_r2 = 0.0  # monitor the best r^2 in the run
-    train_loss_avg, test_loss_avg, train_r2_avg, test_r2_avg = [], [], [], []
-
-    for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(data.shape[0]))):
-        print('Fold {}'.format(fold + 1))
-
-        if finetune_config['CV_flag']:
             train_data = data.loc[train_idx, :].reset_index(drop=True)
             test_data = data.loc[val_idx, :].reset_index(drop=True)
-        else:
-            train_data = deepcopy(data)
-            test_data = pd.read_csv(finetune_config['test_file'])
+
+            if finetune_config['aug_flag']:
+                DataAug = DataAugmentation(finetune_config['aug_indicator'])
+                train_data = DataAug.smiles_augmentation(train_data)
+                if finetune_config['aug_special_flag']:
+                    train_data = DataAug.smiles_augmentation_2(train_data)
+                    train_data = DataAug.combine_smiles(train_data)
+                    test_data = DataAug.combine_smiles(test_data)
+                train_data = DataAug.combine_columns(train_data)
+                test_data = DataAug.combine_columns(test_data)
+
+            scaler = StandardScaler()
+            train_data.iloc[:, 1] = scaler.fit_transform(train_data.iloc[:, 1].values.reshape(-1, 1))
+            test_data.iloc[:, 1] = scaler.transform(test_data.iloc[:, 1].values.reshape(-1, 1))
+
+            train_dataset = Downstream_Dataset(train_data, tokenizer, finetune_config['blocksize'])
+            test_dataset = Downstream_Dataset(test_data, tokenizer, finetune_config['blocksize'])
+            train_dataloader = DataLoader(train_dataset, finetune_config['batch_size'], shuffle=True, num_workers=0)
+            test_dataloader = DataLoader(test_dataset, finetune_config['batch_size'], shuffle=False, num_workers=0)
+
+            """Parameters for scheduler"""
+            steps_per_epoch = train_data.shape[0] // finetune_config['batch_size']
+            training_steps = steps_per_epoch * finetune_config['num_epochs']
+            warmup_steps = int(training_steps * finetune_config['warmup_ratio'])
+
+            """Train the model"""
+            model = DownstreamRegression(drop_rate=finetune_config['drop_rate']).to(device)
+            model = model.double()
+            loss_fn = nn.MSELoss()
+
+            if finetune_config['LLRD_flag']:
+                optimizer = roberta_base_AdamW_LLRD(model, finetune_config['lr_rate'])
+            else:
+                optimizer = AdamW(
+                    [
+                        {"params": model.PretrainedModel.parameters(), "lr": finetune_config['lr_rate'],
+                         "weight_decay": 0.0},
+                        {"params": model.Regressor.parameters(), "lr": finetune_config['lr_rate_reg'],
+                         "weight_decay": 0.01},
+                    ]
+                )
+
+            scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps,
+                                                        num_training_steps=training_steps)
+            torch.cuda.empty_cache()
+            train_loss, test_loss, best_train_r2, best_test_r2 = 0.0, 0.0, 0.0, 0.0  # Keep track of the best test r^2 in one fold. If cross-validation is not used, that will be the same as best_r2.
+            for epoch in range(finetune_config['num_epochs']):
+                print("epoch: %s/%s" % (epoch+1, finetune_config['num_epochs']))
+                train(model, optimizer, scheduler, loss_fn, train_dataloader, device)
+                train_loss, test_loss, best_train_r2, best_test_r2, best_r2 = test(model, loss_fn, train_dataloader,
+                                                                                   test_dataloader, device, scaler,
+                                                                                   train_loss, test_loss, best_train_r2, best_test_r2, best_r2, optimizer, scheduler, epoch)
+            train_loss_avg.append(np.sqrt(train_loss))
+            test_loss_avg.append(np.sqrt(test_loss))
+            train_r2_avg.append(best_train_r2)
+            test_r2_avg.append(best_test_r2)
+            writer.flush()
+
+        """Average of metrics over all folds"""
+        train_rmse = np.mean(np.array(train_loss_avg))
+        test_rmse = np.mean(np.array(test_loss_avg))
+        train_r2 = np.mean(np.array(train_r2_avg))
+        test_r2 = np.mean(np.array(test_r2_avg))
+
+        print("Train RMSE =", train_rmse)
+        print("Test RMSE =", test_rmse)
+        print("Train R^2 =", train_r2)
+        print("Test R^2 =", test_r2)
+
+    else:
+        train_data = pd.read_csv(finetune_config['train_file'])
+        test_data = pd.read_csv(finetune_config['test_file'])
 
         if finetune_config['aug_flag']:
             DataAug = DataAugmentation(finetune_config['aug_indicator'])
@@ -263,8 +325,8 @@ def main(finetune_config):
             test_data = DataAug.combine_columns(test_data)
 
         scaler = StandardScaler()
-        train_data.iloc[:,1] = scaler.fit_transform(train_data.iloc[:,1].values.reshape(-1,1))
-        test_data.iloc[:,1] = scaler.transform(test_data.iloc[:,1].values.reshape(-1,1))
+        train_data.iloc[:, 1] = scaler.fit_transform(train_data.iloc[:, 1].values.reshape(-1, 1))
+        test_data.iloc[:, 1] = scaler.transform(test_data.iloc[:, 1].values.reshape(-1, 1))
 
         train_dataset = Downstream_Dataset(train_data, tokenizer, finetune_config['blocksize'])
         test_dataset = Downstream_Dataset(test_data, tokenizer, finetune_config['blocksize'])
@@ -286,35 +348,26 @@ def main(finetune_config):
         else:
             optimizer = AdamW(
                 [
-                    {"params": model.PretrainedModel.parameters(), "lr": finetune_config['lr_rate'], "weight_decay": 0.0},
-                    {"params": model.Regressor.parameters(), "lr": finetune_config['lr_rate_reg'], "weight_decay": 0.01},
+                    {"params": model.PretrainedModel.parameters(), "lr": finetune_config['lr_rate'],
+                     "weight_decay": 0.0},
+                    {"params": model.Regressor.parameters(), "lr": finetune_config['lr_rate_reg'],
+                     "weight_decay": 0.01},
                 ]
             )
-        """
-        
-        """
-        scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps, num_training_steps=training_steps)
+
+        scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps,
+                                                    num_training_steps=training_steps)
         torch.cuda.empty_cache()
-        best_test_r2 = 0.0    # Keep track of the best test r^2 in one fold. If cross-validation is not used, that will be the same as best_r2.
-        for epoch in finetune_config['num_epochs']:
-            model = train(model, optimizer, scheduler, loss_fn, train_dataloader, device)
-            train_loss, test_loss, best_train_r2, best_test_r2, best_r2 = test(model, loss_fn, train_dataloader, test_dataloader, device, scaler, best_test_r2, best_r2, epoch)
-        train_loss_avg.append(np.sqrt(train_loss))
-        test_loss_avg.append(np.sqrt(test_loss))
-        train_r2_avg.append(best_train_r2)
-        test_r2_avg.append(best_test_r2)
+        train_loss, test_loss, best_train_r2, best_test_r2 = 0.0, 0.0, 0.0, 0.0  # Keep track of the best test r^2 in one fold. If cross-validation is not used, that will be the same as best_r2.
+        for epoch in range(finetune_config['num_epochs']):
+            print("epoch: %s/%s" % (epoch+1,finetune_config['num_epochs']))
+            train(model, optimizer, scheduler, loss_fn, train_dataloader, device)
+            train_loss, test_loss, best_train_r2, best_test_r2, best_r2 = test(model, loss_fn, train_dataloader,
+                                                                               test_dataloader, device, scaler,
+                                                                               train_loss, test_loss, best_train_r2, best_test_r2, best_r2, optimizer, scheduler, epoch)
+
         writer.flush()
 
-    """Average of metrics over all folds"""
-    train_rmse = np.mean(np.array(train_loss_avg))
-    test_rmse = np.mean(np.array(test_loss_avg))
-    train_r2 = np.mean(np.array(train_r2_avg))
-    test_r2 = np.mean(np.array(test_r2_avg))
-
-    print("Train RMSE =", train_rmse)
-    print("Test RMSE =", test_rmse)
-    print("Train R^2 =", train_r2)
-    print("Test R^2 =", test_r2)
 
 if __name__ == "__main__":
 

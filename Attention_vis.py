@@ -100,7 +100,7 @@ def main(attention_config):
 
         for i in range(3):
             for j in range(4):
-                sns.heatmap(attention[-1][0,4*i+j,:,:].cpu().detach().numpy(), ax = axes[i,j], xticklabels=xticklabels, yticklabels=xticklabels)
+                sns.heatmap(attention[attention_config['layer']][0,4*i+j,:,:].cpu().detach().numpy(), ax = axes[i,j], xticklabels=xticklabels, yticklabels=xticklabels)
                 axes[i,j].set_title(label="Attention Head %s" % str(4*i+j+1), fontsize=attention_config['fontsize'])
                 axes[i,j].tick_params(labelsize=attention_config['labelsize'])
                 cbar = axes[i,j].collections[0].colorbar
@@ -124,8 +124,7 @@ def main(attention_config):
                 cbar = axes[i, j].collections[0].colorbar
                 # here set the labelsize by 20
                 cbar.ax.tick_params(labelsize=attention_config['labelsize'])
-    plt.savefig(save_path, bbox_inches='tight')
-    #"""
+    plt.savefig(attention_config['save_path'], bbox_inches='tight')
 
 if __name__ == "__main__":
 
@@ -134,7 +133,7 @@ if __name__ == "__main__":
     """Device"""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    PretrainedModel = RobertaModel.from_pretrained(attention_config['pretrain_path'])
+    PretrainedModel = RobertaModel.from_pretrained(attention_config['pretrain_path']).to(device)
     tokenizer = PolymerSmilesTokenizer.from_pretrained("roberta-base", max_len=attention_config['blocksize'])
 
     main(attention_config)

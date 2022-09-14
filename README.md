@@ -38,6 +38,7 @@ $ conda install -c conda-forge tensorboard==2.9.1
 $ conda install -c conda-forge torchmetrics==0.9.2
 $ conda install -c conda-forge packaging==21.0
 $ conda install -c conda-forge seaborn==0.11.2
+$ conda install --channel conda-forge opentsne==0.6.2
 
 # clone the source code of TransPolymer
 $ git clone https://github.com/ChangwenXu98/TransPolymer.git

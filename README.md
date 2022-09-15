@@ -1,7 +1,7 @@
 ## TransPolymer ##
 
 #### [[arXiv]](https://arxiv.org/abs/2209.01307) </br>
-[Changwen Xu](https://github.com/ChangwenXu98), [Yuyang Wang](https://yuyangw.github.io/), [Amir Barati Farimani](https://www.meche.engineering.cmu.edu/directory/bios/barati-farimani-amir.html) </br>
+[Changwen Xu](https://www.linkedin.com/in/changwenxu), [Yuyang Wang](https://yuyangw.github.io/), [Amir Barati Farimani](https://www.meche.engineering.cmu.edu/directory/bios/barati-farimani-amir.html) </br>
 Carnegie Mellon University </br>
 
 <img src="figs/pipeline.png" width="500">

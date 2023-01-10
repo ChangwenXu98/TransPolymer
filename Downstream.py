@@ -143,12 +143,12 @@ def train(model, optimizer, scheduler, loss_fn, train_dataloader, device):
 
     return None
 
-def test(model, loss_fn, train_dataloader, test_dataloader, device, scaler, train_loss_best, test_loss_best, best_train_r2, best_test_r2, best_r2, optimizer, scheduler, epoch):
+def test(model, loss_fn, train_dataloader, test_dataloader, device, scaler, optimizer, scheduler, epoch):
 
     r2score = R2Score()
     train_loss = 0
     test_loss = 0
-    count = 0
+    # count = 0
     model.eval()
     with torch.no_grad():
         train_pred, train_true, test_pred, test_true = torch.tensor([]), torch.tensor([]), torch.tensor(
@@ -197,6 +197,10 @@ def test(model, loss_fn, train_dataloader, test_dataloader, device, scaler, trai
              'epoch': epoch}
     torch.save(state, finetune_config['save_path'])
 
+    return train_loss, test_loss, r2_train, r2_test
+
+    """
+
     if r2_test > best_test_r2:
         best_train_r2 = r2_train
         best_test_r2 = r2_test
@@ -219,6 +223,7 @@ def test(model, loss_fn, train_dataloader, test_dataloader, device, scaler, trai
             return train_loss_best, test_loss_best, best_train_r2, best_test_r2, best_r2
 
     return train_loss_best, test_loss_best, best_train_r2, best_test_r2, best_r2
+    """
 
 def main(finetune_config):
 
@@ -231,6 +236,7 @@ def main(finetune_config):
 
     """Data"""
     if finetune_config['CV_flag']:
+        print("Start Cross Validation")
         data = pd.read_csv(finetune_config['train_file'])
         """K-fold"""
         splits = KFold(n_splits=finetune_config['k'], shuffle=True,
@@ -243,6 +249,7 @@ def main(finetune_config):
             test_data = data.loc[val_idx, :].reset_index(drop=True)
 
             if finetune_config['aug_flag']:
+                print("Data Augamentation")
                 DataAug = DataAugmentation(finetune_config['aug_indicator'])
                 train_data = DataAug.smiles_augmentation(train_data)
                 if finetune_config['aug_special_flag']:
@@ -286,15 +293,36 @@ def main(finetune_config):
             scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps,
                                                         num_training_steps=training_steps)
             torch.cuda.empty_cache()
-            train_loss, test_loss, best_train_r2, best_test_r2 = 0.0, 0.0, 0.0, 0.0  # Keep track of the best test r^2 in one fold. If cross-validation is not used, that will be the same as best_r2.
+            train_loss_best, test_loss_best, best_train_r2, best_test_r2 = 0.0, 0.0, 0.0, 0.0  # Keep track of the best test r^2 in one fold. If cross-validation is not used, that will be the same as best_r2.
+            count = 0     # Keep track of how many successive non-improvement epochs
             for epoch in range(finetune_config['num_epochs']):
                 print("epoch: %s/%s" % (epoch+1, finetune_config['num_epochs']))
                 train(model, optimizer, scheduler, loss_fn, train_dataloader, device)
-                train_loss, test_loss, best_train_r2, best_test_r2, best_r2 = test(model, loss_fn, train_dataloader,
+                train_loss, test_loss, r2_train, r2_test = test(model, loss_fn, train_dataloader,
                                                                                    test_dataloader, device, scaler,
-                                                                                   train_loss, test_loss, best_train_r2, best_test_r2, best_r2, optimizer, scheduler, epoch)
-            train_loss_avg.append(np.sqrt(train_loss))
-            test_loss_avg.append(np.sqrt(test_loss))
+                                                                                   optimizer, scheduler, epoch)
+                if r2_test > best_test_r2:
+                    best_train_r2 = r2_train
+                    best_test_r2 = r2_test
+                    train_loss_best = train_loss
+                    test_loss_best = test_loss
+                    count = 0
+                else:
+                    count += 1
+
+                if r2_test > best_r2:
+                    best_r2 = r2_test
+                    state = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict(), 'epoch': epoch}
+                    torch.save(state, finetune_config['best_model_path'])         # save the best model
+
+                if count >= finetune_config['tolerance']:
+                    print("Early stop")
+                    if best_test_r2 == 0:
+                        print("Poor performance with negative r^2")
+                    break
+
+            train_loss_avg.append(np.sqrt(train_loss_best))
+            test_loss_avg.append(np.sqrt(test_loss_best))
             train_r2_avg.append(best_train_r2)
             test_r2_avg.append(best_test_r2)
             writer.flush()
@@ -304,17 +332,23 @@ def main(finetune_config):
         test_rmse = np.mean(np.array(test_loss_avg))
         train_r2 = np.mean(np.array(train_r2_avg))
         test_r2 = np.mean(np.array(test_r2_avg))
+        std_test_rmse = np.std(np.array(test_loss_avg))
+        std_test_r2 = np.std(np.array(test_r2_avg))
 
         print("Train RMSE =", train_rmse)
         print("Test RMSE =", test_rmse)
         print("Train R^2 =", train_r2)
         print("Test R^2 =", test_r2)
+        print("Standard Deviation of Test RMSE =", std_test_rmse)
+        print("Standard Deviation of Test R^2 =", std_test_r2)
 
     else:
+        print("Train Test Split")
         train_data = pd.read_csv(finetune_config['train_file'])
         test_data = pd.read_csv(finetune_config['test_file'])
 
         if finetune_config['aug_flag']:
+            print("Data Augmentation")
             DataAug = DataAugmentation(finetune_config['aug_indicator'])
             train_data = DataAug.smiles_augmentation(train_data)
             if finetune_config['aug_special_flag']:
@@ -358,13 +392,33 @@ def main(finetune_config):
         scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps,
                                                     num_training_steps=training_steps)
         torch.cuda.empty_cache()
-        train_loss, test_loss, best_train_r2, best_test_r2 = 0.0, 0.0, 0.0, 0.0  # Keep track of the best test r^2 in one fold. If cross-validation is not used, that will be the same as best_r2.
+        train_loss_best, test_loss_best, best_train_r2, best_test_r2 = 0.0, 0.0, 0.0, 0.0  # Keep track of the best test r^2 in one fold. If cross-validation is not used, that will be the same as best_r2.
+        count = 0     # Keep track of how many successive non-improvement epochs
         for epoch in range(finetune_config['num_epochs']):
             print("epoch: %s/%s" % (epoch+1,finetune_config['num_epochs']))
             train(model, optimizer, scheduler, loss_fn, train_dataloader, device)
-            train_loss, test_loss, best_train_r2, best_test_r2, best_r2 = test(model, loss_fn, train_dataloader,
-                                                                               test_dataloader, device, scaler,
-                                                                               train_loss, test_loss, best_train_r2, best_test_r2, best_r2, optimizer, scheduler, epoch)
+            train_loss, test_loss, r2_train, r2_test = test(model, loss_fn, train_dataloader,
+                                                                                   test_dataloader, device, scaler,
+                                                                                   optimizer, scheduler, epoch)
+            if r2_test > best_test_r2:
+                best_train_r2 = r2_train
+                best_test_r2 = r2_test
+                train_loss_best = train_loss
+                test_loss_best = test_loss
+                count = 0
+            else:
+                count += 1
+
+            if r2_test > best_r2:
+                best_r2 = r2_test
+                state = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict(), 'epoch': epoch}
+                torch.save(state, finetune_config['best_model_path'])         # save the best model
+
+            if count >= finetune_config['tolerance']:
+                print("Early stop")
+                if best_test_r2 == 0:
+                    print("Poor performance with negative r^2")
+                break
 
         writer.flush()
 

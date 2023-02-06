@@ -8,14 +8,15 @@ weight_decay: 0.0                       # weight decay for AdamW
 warmup_ratio: 0.05                      # warm-up ratio for scheduler
 save_strategy: 'epoch'                  # save strategy of trainer
 overwrite_output_dir: True              # whether to overwrite output directory (i.e. True/False)
-save_total_limit: 30                    # save total limit of trainer
+save_total_limit: 3                    # save total limit of trainer
 fp16: True                              # float precision 16 (i.e. True/False)
 logging_strategy: 'epoch'               # logging frequency
 evaluation_strategy: 'epoch'            # validation frequency
 report_to: 'tensorboard'                # integrations to report the results and logs to
 dataloader_num_workers: 18              # Number of subprocesses to use for data loading
-sharded_ddp: 'simple'                   # option of Sharded DDP training
+sharded_ddp: False                   # option of Sharded DDP training
 save_path: 'ckpt/pretrain.pt'           # logging and save path of the pretrained model
+load_checkpoint: False
 
 max_position_embeddings: 514            # max position embeddings of Transformer
 blocksize: 175                          # max length of sequences after tokenization

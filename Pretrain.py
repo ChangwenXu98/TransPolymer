@@ -97,8 +97,9 @@ def main(pretrain_config):
 
     """Train and save model"""
     #torch.cuda.empty_cache()
-    trainer.train()
-    trainer.save_model(save_path)
+    #trainer.train()
+    trainer.train(resume_from_checkpoint=pretrain_config['load_checkpoint'])
+    trainer.save_model(pretrain_config["save_path"])
 
 if __name__ == "__main__":
 

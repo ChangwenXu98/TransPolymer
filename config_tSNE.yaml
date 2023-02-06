@@ -1,13 +1,28 @@
-pretrain_path: 'data/pretrain.csv'               # pretrain file path
+pretrain_path: 'data/pretrain_1M.csv'               # pretrain file path
 PE_I_path: 'data/PE_I.csv'                       # PE-I file path
 PE_II_path: 'data/PE_II.csv'                     # PE-II file path
 Egc_path: 'data/Egc.csv'                         # Egc file path
+Egb_path: 'data/Egb.csv'                         # Egb file path
+Eea_path: 'data/Eea.csv'                         # Eea file path
+Ei_path: 'data/Ei.csv'                           # Ei file path
 Xc_path: 'data/Xc.csv'                           # Xc file path
 EPS_path: 'data/EPS.csv'                         # EPS file path
-Ei_path: 'data/Ei.csv'                           # Ei file path
 Nc_path: 'data/Nc.csv'                           # Nc file path
 OPV_path: 'data/OPV.csv'                         # OPV file path
-save_path: 'figs/tSNE.png'                       # save path of tSNE visualization
+
+pretrain_label: 'Pretrain (1M)'
+PE-I_label: 'PE-I'
+PE-II_label: 'PE-II'
+Egc_label: 'Egc'                         
+Egb_label: 'Egb'                         
+Eea_label: 'Eea'                         
+Ei_label: 'Ei'                          
+Xc_label: 'Xc'                          
+EPS_label: 'EPS'                         
+Nc_label: 'Nc'                         
+OPV_label: 'OPV'                        
+
+save_path: 'figs/tSNE_1M.png'                       # save path of tSNE visualization
 
 blocksize: 512                                   # max length of sequences after tokenization
 batch_size: 64                                   # batch size

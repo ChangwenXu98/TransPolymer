@@ -39,7 +39,7 @@ np.random.seed(seed=1)
 
 """Layer-wise learning rate decay"""
 
-def roberta_base_AdamW_LLRD(model, lr):
+def roberta_base_AdamW_LLRD(model, lr, weight_decay):
     opt_parameters = []  # To be passed to the optimizer (only parameters of the layers you want to update).
     named_parameters = list(model.named_parameters())
     print("number of named parameters =", len(named_parameters))
@@ -60,7 +60,7 @@ def roberta_base_AdamW_LLRD(model, lr):
     head_params = {"params": params_0, "lr": lr, "weight_decay": 0.0}
     opt_parameters.append(head_params)
 
-    head_params = {"params": params_1, "lr": lr, "weight_decay": 0.01}
+    head_params = {"params": params_1, "lr": lr, "weight_decay": weight_decay}
     opt_parameters.append(head_params)
 
     print("pooler and regressor lr =", lr)
@@ -78,7 +78,7 @@ def roberta_base_AdamW_LLRD(model, lr):
         layer_params = {"params": params_0, "lr": lr, "weight_decay": 0.0}
         opt_parameters.append(layer_params)
 
-        layer_params = {"params": params_1, "lr": lr, "weight_decay": 0.01}
+        layer_params = {"params": params_1, "lr": lr, "weight_decay": weight_decay}
         opt_parameters.append(layer_params)
 
         print("hidden layer", layer, "lr =", lr)
@@ -97,7 +97,7 @@ def roberta_base_AdamW_LLRD(model, lr):
     embed_params = {"params": params_0, "lr": lr, "weight_decay": 0.0}
     opt_parameters.append(embed_params)
 
-    embed_params = {"params": params_1, "lr": lr, "weight_decay": 0.01}
+    embed_params = {"params": params_1, "lr": lr, "weight_decay": weight_decay}
     opt_parameters.append(embed_params)
     print("embedding layer lr =", lr)
 
@@ -265,8 +265,8 @@ def main(finetune_config):
 
             train_dataset = Downstream_Dataset(train_data, tokenizer, finetune_config['blocksize'])
             test_dataset = Downstream_Dataset(test_data, tokenizer, finetune_config['blocksize'])
-            train_dataloader = DataLoader(train_dataset, finetune_config['batch_size'], shuffle=True, num_workers=0)
-            test_dataloader = DataLoader(test_dataset, finetune_config['batch_size'], shuffle=False, num_workers=0)
+            train_dataloader = DataLoader(train_dataset, finetune_config['batch_size'], shuffle=True, num_workers=finetune_config["num_workers"])
+            test_dataloader = DataLoader(test_dataset, finetune_config['batch_size'], shuffle=False, num_workers=finetune_config["num_workers"])
 
             """Parameters for scheduler"""
             steps_per_epoch = train_data.shape[0] // finetune_config['batch_size']
@@ -279,14 +279,14 @@ def main(finetune_config):
             loss_fn = nn.MSELoss()
 
             if finetune_config['LLRD_flag']:
-                optimizer = roberta_base_AdamW_LLRD(model, finetune_config['lr_rate'])
+                optimizer = roberta_base_AdamW_LLRD(model, finetune_config['lr_rate'], finetune_config['weight_decay'])
             else:
                 optimizer = AdamW(
                     [
                         {"params": model.PretrainedModel.parameters(), "lr": finetune_config['lr_rate'],
                          "weight_decay": 0.0},
                         {"params": model.Regressor.parameters(), "lr": finetune_config['lr_rate_reg'],
-                         "weight_decay": 0.01},
+                         "weight_decay": finetune_config['weight_decay']},
                     ]
                 )
 
@@ -312,7 +312,7 @@ def main(finetune_config):
 
                 if r2_test > best_r2:
                     best_r2 = r2_test
-                    state = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict(), 'epoch': epoch}
+                    state = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict(), 'epoch': epoch, 'fold:': fold}
                     torch.save(state, finetune_config['best_model_path'])         # save the best model
 
                 if count >= finetune_config['tolerance']:
@@ -364,8 +364,8 @@ def main(finetune_config):
 
         train_dataset = Downstream_Dataset(train_data, tokenizer, finetune_config['blocksize'])
         test_dataset = Downstream_Dataset(test_data, tokenizer, finetune_config['blocksize'])
-        train_dataloader = DataLoader(train_dataset, finetune_config['batch_size'], shuffle=True, num_workers=0)
-        test_dataloader = DataLoader(test_dataset, finetune_config['batch_size'], shuffle=False, num_workers=0)
+        train_dataloader = DataLoader(train_dataset, finetune_config['batch_size'], shuffle=True, num_workers=finetune_config["num_workers"])
+        test_dataloader = DataLoader(test_dataset, finetune_config['batch_size'], shuffle=False, num_workers=finetune_config["num_workers"])
 
         """Parameters for scheduler"""
         steps_per_epoch = train_data.shape[0] // finetune_config['batch_size']
@@ -378,14 +378,14 @@ def main(finetune_config):
         loss_fn = nn.MSELoss()
 
         if finetune_config['LLRD_flag']:
-            optimizer = roberta_base_AdamW_LLRD(model, finetune_config['lr_rate'])
+            optimizer = roberta_base_AdamW_LLRD(model, finetune_config['lr_rate'], finetune_config['weight_decay'])
         else:
             optimizer = AdamW(
                 [
                     {"params": model.PretrainedModel.parameters(), "lr": finetune_config['lr_rate'],
                      "weight_decay": 0.0},
                     {"params": model.Regressor.parameters(), "lr": finetune_config['lr_rate_reg'],
-                     "weight_decay": 0.01},
+                     "weight_decay": finetune_config['weight_decay']},
                 ]
             )
 
@@ -426,6 +426,7 @@ def main(finetune_config):
 if __name__ == "__main__":
 
     finetune_config = yaml.load(open("config_finetune.yaml", "r"), Loader=yaml.FullLoader)
+    print(finetune_config)
 
     """Device"""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

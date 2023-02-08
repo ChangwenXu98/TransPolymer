@@ -64,6 +64,11 @@ The original and processed datasets are included in the data folder.
 ### Tokenization
 `PolymerSmilesTokenization.py` is adapted from RobertaTokenizer from [huggingface](https://github.com/huggingface/transformers/tree/v4.21.2) with a specially designed regular expression for tokenization with chemical awareness.
 
+### Checkpoints
+Pretrained model can be found in `ckpt` folder.
+
+## Run the Model
+
 ### Pretraining
 To pretrain TransPolymer, where the configurations and detailed explaination for each variable can be found in `config.yaml`.
 ```
@@ -76,6 +81,8 @@ To finetune the pretrained TransPolymer on different downstream benchmarks about
 ```
 $ python Downstream.py
 ```
+
+## Visualization
 
 ### Attention Visualization
 To visualize the attention scores for interpretability of pretraining and finetuning phases, where the configurations and detailed explaination for each variable can be found in `config_attention.yaml`.

@@ -6,7 +6,7 @@ Carnegie Mellon University </br>
 
 <img src="figs/pipeline.png" width="500">
 
-This is the official implementation of <strong><em>TransPolymer</em></strong>: "TransPolymer: a Transformer-based language model for polymer property predictions". In this work, we introduce TransPolymer, a Transformer-based language model, for representation learning of polymer sequences by pretraining on a large unlabeled dataset (~5M unique sequences) via self-supervised masked language modeling and making accurate and efficient predictions of polymer properties in downstream tasks by finetuning. If you find our work useful in your research, please cite:
+This is the official implementation of <strong><em>TransPolymer</em></strong>: "TransPolymer: a Transformer-based language model for polymer property predictions". In this work, we introduce TransPolymer, a Transformer-based language model, for representation learning of polymer sequences by pretraining on a large unlabeled dataset (~5M polymer sequences) via self-supervised masked language modeling and making accurate and efficient predictions of polymer properties in downstream tasks by finetuning. If you find our work useful in your research, please cite:
 ```
 @article{xu2023transpolymer,
   title={TransPolymer: a Transformer-based language model for polymer property predictions},

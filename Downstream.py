@@ -35,6 +35,7 @@ writer = SummaryWriter()
 
 from copy import deepcopy
 
+
 np.random.seed(seed=1)
 
 """Layer-wise learning rate decay"""
@@ -89,7 +90,7 @@ def roberta_base_AdamW_LLRD(model, lr, weight_decay):
 
     params_0 = [p for n, p in named_parameters if "embeddings" in n
                 and any(nd in n for nd in no_decay)]
-    print("params in embeddings layer without decay =", len(params_0))
+    print("params in embeddings layer without decay d=", len(params_0))
     params_1 = [p for n, p in named_parameters if "embeddings" in n
                 and not any(nd in n for nd in no_decay)]
     print("params in embeddings layer with decay =", len(params_1))
@@ -435,7 +436,7 @@ if __name__ == "__main__":
     if finetune_config['model_indicator'] == 'pretrain':
         print("Use the pretrained model")
         PretrainedModel = RobertaModel.from_pretrained(finetune_config['model_path'])
-        tokenizer = PolymerSmilesTokenizer.from_pretrained("roberta-base", max_len=finetune_config['blocksize'])
+        tokenizer = PolymerSmilesTokenizer.from_pretrained("/project/rcc/hyadav/roberta-base", max_len=finetune_config['blocksize'])
         PretrainedModel.config.hidden_dropout_prob = finetune_config['hidden_dropout_prob']
         PretrainedModel.config.attention_probs_dropout_prob = finetune_config['attention_probs_dropout_prob']
     else:
@@ -450,7 +451,7 @@ if __name__ == "__main__":
             attention_probs_dropout_prob=0.1
         )
         PretrainedModel = RobertaModel(config=config)
-        tokenizer = RobertaTokenizer.from_pretrained("roberta-base", max_len=finetune_config['blocksize'])
+        tokenizer = RobertaTokenizer.from_pretrained("/project/rcc/hyadav/roberta-base", max_len=finetune_config['blocksize'])
     max_token_len = finetune_config['blocksize']
 
     """Run the main function"""

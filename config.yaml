@@ -1,7 +1,7 @@
 file_path: 'data/pretrain.csv'          # pretrain data path
 
 epochs: 30                              # total number of epochs
-batch_size: 100                         # batch size
+batch_size: 100                        # batch size
 lr_rate: 0.00005                        # learning rate
 scheduler_type: 'linear'                # scheduler type
 weight_decay: 0.0                       # weight decay for AdamW

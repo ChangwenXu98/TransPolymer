@@ -35,6 +35,7 @@ writer = SummaryWriter()
 
 from copy import deepcopy
 
+import pdb
 
 np.random.seed(seed=1)
 
@@ -129,6 +130,7 @@ class DownstreamRegression(nn.Module):
 
 def train(model, optimizer, scheduler, loss_fn, train_dataloader, device):
 
+    print("\n Number of parameteres are: ", sum(param.numel() for param in model.parameters() if param.requires_grad))
     model.train()
 
     for step, batch in enumerate(train_dataloader):
@@ -150,6 +152,7 @@ def test(model, loss_fn, train_dataloader, test_dataloader, device, scaler, opti
     train_loss = 0
     test_loss = 0
     # count = 0
+    print("\n Number of parameteres are: ", sum(param.numel() for param in model.parameters() if param.requires_grad))
     model.eval()
     with torch.no_grad():
         train_pred, train_true, test_pred, test_true = torch.tensor([]), torch.tensor([]), torch.tensor(
@@ -188,6 +191,39 @@ def test(model, loss_fn, train_dataloader, test_dataloader, device, scaler, opti
         r2_test = r2score(test_pred.flatten().to("cpu"), test_true.flatten().to("cpu")).item()
         print("test RMSE = ", np.sqrt(test_loss))
         print("test r^2 = ", r2_test)
+
+        # pdb.set_trace()
+
+        #Plot results
+        #create basic scatterplot
+        x = test_true.detach().cpu().numpy()
+        y = test_pred.detach().cpu().numpy()
+        x = x.reshape((x.shape[0], ))
+        y = y.reshape((y.shape[0], ))
+
+        # pdb.set_trace()
+
+        plt.clf()
+
+        fig, ax = plt.subplots()
+
+        ax.plot(x, y, 'o', color = 'green', markersize=2)
+
+        #obtain m (slope) and b(intercept) of linear regression line
+        m, b = np.polyfit(x, y, 1)
+
+        #add linear regression line to scatterplot 
+        ax.plot(x, m*x+b, color = 'red')
+
+ 
+        textstr = '\n'.join((r'$RMSE$=%.2f' % (np.sqrt(test_loss),),r'$R^2$=%.2f' % (r2_test, ),))
+
+        ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14,verticalalignment='top')
+
+        fig.savefig("./plots/test_plot_combined_rmse_%.2f_r2_%.2f_2.png" %((np.sqrt(test_loss)),(r2_test)))
+
+        # exit()
+
 
     writer.add_scalar("Loss/train", train_loss, epoch)
     writer.add_scalar("r^2/train", r2_train, epoch)
@@ -278,6 +314,8 @@ def main(finetune_config):
             model = DownstreamRegression(drop_rate=finetune_config['drop_rate']).to(device)
             model = model.double()
             loss_fn = nn.MSELoss()
+
+            print("\n ********** Number of parameteres are: ", sum(param.numel() for param in model.parameters() if param.requires_grad))
 
             if finetune_config['LLRD_flag']:
                 optimizer = roberta_base_AdamW_LLRD(model, finetune_config['lr_rate'], finetune_config['weight_decay'])
@@ -435,8 +473,8 @@ if __name__ == "__main__":
 
     if finetune_config['model_indicator'] == 'pretrain':
         print("Use the pretrained model")
-        PretrainedModel = RobertaModel.from_pretrained(finetune_config['model_path'])
-        tokenizer = PolymerSmilesTokenizer.from_pretrained("/project/rcc/hyadav/roberta-base", max_len=finetune_config['blocksize'])
+        PretrainedModel = RobertaModel.from_pretrained("/project/rcc/hyadav/ChemBERTa-77M-MTR")
+        tokenizer = PolymerSmilesTokenizer.from_pretrained("/project/rcc/hyadav/ChemBERTa-77M-MTR", max_len=finetune_config['blocksize'])
         PretrainedModel.config.hidden_dropout_prob = finetune_config['hidden_dropout_prob']
         PretrainedModel.config.attention_probs_dropout_prob = finetune_config['attention_probs_dropout_prob']
     else:
@@ -451,7 +489,7 @@ if __name__ == "__main__":
             attention_probs_dropout_prob=0.1
         )
         PretrainedModel = RobertaModel(config=config)
-        tokenizer = RobertaTokenizer.from_pretrained("/project/rcc/hyadav/roberta-base", max_len=finetune_config['blocksize'])
+        tokenizer = RobertaTokenizer.from_pretrained("/project/rcc/hyadav/ChemBERTa-77M-MTR", max_len=finetune_config['blocksize'])
     max_token_len = finetune_config['blocksize']
 
     """Run the main function"""

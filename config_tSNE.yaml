@@ -9,6 +9,7 @@ Xc_path: 'data/Xc.csv'                           # Xc file path
 EPS_path: 'data/EPS.csv'                         # EPS file path
 Nc_path: 'data/Nc.csv'                           # Nc file path
 OPV_path: 'data/OPV.csv'                         # OPV file path
+Liq_path: 'data/our_combined.csv'                 #Liquid Electrolyte path
 
 pretrain_label: 'Pretrain (1M)'
 PE-I_label: 'PE-I'
@@ -20,12 +21,12 @@ Ei_label: 'Ei'
 Xc_label: 'Xc'                          
 EPS_label: 'EPS'                         
 Nc_label: 'Nc'                         
-OPV_label: 'OPV'                        
+OPV_label: 'OPV'
+Liq_label: 'Liq'                        
 
-save_path: 'figs/tSNE_1M.png'                       # save path of tSNE visualization
-
+save_path: 'figs/tSNE_Liq.png'                       # save path of tSNE visualization
 blocksize: 512                                   # max length of sequences after tokenization
-batch_size: 64                                   # batch size
+batch_size: 8                                   # batch size
 
 perplexity: 50                                   # perplexity of t-SNE
 metric: 'euclidean'                              # metric of t-SNE

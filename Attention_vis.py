@@ -84,7 +84,7 @@ def main(attention_config):
     else:
         model = DownstreamRegression(drop_rate=0).to(device)
         checkpoint = torch.load(attention_config['model_path'])
-        model.load_state_dict(checkpoint['model'])
+        # model.load_state_dict(checkpoint['model'])
         model = model.double()
 
         model.eval()
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     PretrainedModel = RobertaModel.from_pretrained(attention_config['pretrain_path']).to(device)
-    tokenizer = PolymerSmilesTokenizer.from_pretrained("roberta-base", max_len=attention_config['blocksize'])
+    tokenizer = PolymerSmilesTokenizer.from_pretrained("/project/rcc/hyadav/roberta-base", max_len=attention_config['blocksize'])
 
     main(attention_config)
 

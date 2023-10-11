@@ -1,0 +1,7 @@
+# Ignore the following directories
+sbatch_files/
+test_plots/
+runs/
+plots/
+ckpt/
+

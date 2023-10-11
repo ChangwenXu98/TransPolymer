@@ -53,7 +53,7 @@ def emb_convert(file_path, tokenizer, config):
 
 def main(tsne_config):
 
-    tokenizer = PolymerSmilesTokenizer.from_pretrained("roberta-base", max_len=tsne_config['blocksize'])
+    tokenizer = PolymerSmilesTokenizer.from_pretrained("/project/rcc/hyadav/roberta-base", max_len=tsne_config['blocksize'])
     config = RobertaConfig(
             vocab_size=50265,
             max_position_embeddings=514,
@@ -65,16 +65,17 @@ def main(tsne_config):
         )
 
     pretrain_data = emb_convert(tsne_config['pretrain_path'], tokenizer, config)
-    PE_I_data = emb_convert(tsne_config['PE_I_path'], tokenizer, config)
-    PE_II_data = emb_convert(tsne_config['PE_II_path'], tokenizer, config)
-    Egc_data = emb_convert(tsne_config['Egc_path'], tokenizer, config)
-    Egb_data = emb_convert(tsne_config['Egb_path'], tokenizer, config)
-    Eea_data = emb_convert(tsne_config['Eea_path'], tokenizer, config)
-    Ei_data = emb_convert(tsne_config['Ei_path'], tokenizer, config)
-    Xc_data = emb_convert(tsne_config['Xc_path'], tokenizer, config)
-    EPS_data = emb_convert(tsne_config['EPS_path'], tokenizer, config)
-    Nc_data = emb_convert(tsne_config['Nc_path'], tokenizer, config)
-    OPV_data = emb_convert(tsne_config['OPV_path'], tokenizer, config)
+    # PE_I_data = emb_convert(tsne_config['PE_I_path'], tokenizer, config)
+    # PE_II_data = emb_convert(tsne_config['PE_II_path'], tokenizer, config)
+    # Egc_data = emb_convert(tsne_config['Egc_path'], tokenizer, config)
+    # Egb_data = emb_convert(tsne_config['Egb_path'], tokenizer, config)
+    # Eea_data = emb_convert(tsne_config['Eea_path'], tokenizer, config)
+    # Ei_data = emb_convert(tsne_config['Ei_path'], tokenizer, config)
+    # Xc_data = emb_convert(tsne_config['Xc_path'], tokenizer, config)
+    # EPS_data = emb_convert(tsne_config['EPS_path'], tokenizer, config)
+    # Nc_data = emb_convert(tsne_config['Nc_path'], tokenizer, config)
+    # OPV_data = emb_convert(tsne_config['OPV_path'], tokenizer, config)
+    # Liq_data = emb_convert(tsne_config['Liq_path'], tokenizer, config)
 
     print("start fitting t-SNE")
     tSNE = TSNE(
@@ -85,38 +86,41 @@ def main(tsne_config):
     )
     pretrain_tSNE = tSNE.fit(pretrain_data)
     print("finish fitting")
-    PE_I_tSNE = pretrain_tSNE.transform(PE_I_data)
-    PE_II_tSNE = pretrain_tSNE.transform(PE_II_data)
-    Egc_tSNE = pretrain_tSNE.transform(Egc_data)
-    Egb_tSNE = pretrain_tSNE.transform(Egb_data)
-    Eea_tSNE = pretrain_tSNE.transform(Eea_data)
-    Ei_tSNE = pretrain_tSNE.transform(Ei_data)
-    Xc_tSNE = pretrain_tSNE.transform(Xc_data)
-    EPS_tSNE = pretrain_tSNE.transform(EPS_data)
-    Nc_tSNE = pretrain_tSNE.transform(Nc_data)
-    OPV_tSNE = pretrain_tSNE.transform(OPV_data)
+    # PE_I_tSNE = pretrain_tSNE.transform(PE_I_data)
+    # PE_II_tSNE = pretrain_tSNE.transform(PE_II_data)
+    # Egc_tSNE = pretrain_tSNE.transform(Egc_data)
+    # Egb_tSNE = pretrain_tSNE.transform(Egb_data)
+    # Eea_tSNE = pretrain_tSNE.transform(Eea_data)
+    # Ei_tSNE = pretrain_tSNE.transform(Ei_data)
+    # Xc_tSNE = pretrain_tSNE.transform(Xc_data)
+    # EPS_tSNE = pretrain_tSNE.transform(EPS_data)
+    # Nc_tSNE = pretrain_tSNE.transform(Nc_data)
+    # OPV_tSNE = pretrain_tSNE.transform(OPV_data)
+    # Liq_tSNE = pretrain_tSNE.transform(Liq_data)
     print("finish t-SNE")
 
     fig, ax = plt.subplots(figsize=(15, 15))
     ax.scatter(pretrain_tSNE[:, 0], pretrain_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='lightgrey',
                label=tsne_config["pretrain_label"])
-    ax.scatter(PE_I_tSNE[:, 0], PE_I_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='maroon', label=tsne_config["PE-I_label"])
-    ax.scatter(PE_II_tSNE[:, 0], PE_II_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='coral', label=tsne_config["PE-II_label"])
-    ax.scatter(Egc_tSNE[:, 0], Egc_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='darkorange', label=tsne_config["Egc_label"])
-    ax.scatter(Egb_tSNE[:, 0], Egb_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='gold', label=tsne_config["Egb_label"])
-    ax.scatter(Eea_tSNE[:, 0], Eea_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='lawngreen', label=tsne_config["Eea_label"])
-    ax.scatter(Ei_tSNE[:, 0], Ei_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='green', label=tsne_config["Ei_label"])
-    ax.scatter(Xc_tSNE[:, 0], Xc_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='cyan', label=tsne_config["Xc_label"])
-    ax.scatter(EPS_tSNE[:, 0], EPS_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='blue', label=tsne_config["EPS_label"])
-    ax.scatter(Nc_tSNE[:, 0], Nc_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='violet', label=tsne_config["Nc_label"])
-    ax.scatter(OPV_tSNE[:, 0], OPV_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='deeppink', label=tsne_config["OPV_label"])
-
+    # ax.scatter(PE_I_tSNE[:, 0], PE_I_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='maroon', label=tsne_config["PE-I_label"])
+    # ax.scatter(PE_II_tSNE[:, 0], PE_II_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='coral', label=tsne_config["PE-II_label"])
+    # ax.scatter(Egc_tSNE[:, 0], Egc_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='darkorange', label=tsne_config["Egc_label"])
+    # ax.scatter(Egb_tSNE[:, 0], Egb_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='gold', label=tsne_config["Egb_label"])
+    # ax.scatter(Eea_tSNE[:, 0], Eea_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='lawngreen', label=tsne_config["Eea_label"])
+    # ax.scatter(Ei_tSNE[:, 0], Ei_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='green', label=tsne_config["Ei_label"])
+    # ax.scatter(Xc_tSNE[:, 0], Xc_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='cyan', label=tsne_config["Xc_label"])
+    # ax.scatter(EPS_tSNE[:, 0], EPS_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='blue', label=tsne_config["EPS_label"])
+    # ax.scatter(Nc_tSNE[:, 0], Nc_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='violet', label=tsne_config["Nc_label"])
+    # ax.scatter(OPV_tSNE[:, 0], OPV_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='deeppink', label=tsne_config["OPV_label"])
+    # ax.scatter(Liq_tSNE[:, 0], Liq_tSNE[:, 1], s=50, edgecolors='None', linewidths=0.4, c='crimson', label=tsne_config["Liq_label"])
+ 
     ax.set_xticks([])
     ax.set_yticks([])
 
     ax.axis('off')
     ax.legend(fontsize=20, loc='upper left')
     plt.savefig(tsne_config['save_path'], bbox_inches='tight')
+    print("File Saved")
 
 
 if __name__ == "__main__":

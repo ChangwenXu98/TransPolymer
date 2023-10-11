@@ -1,14 +1,14 @@
-task: 'pretrain'                                      # the task to visualize the attention scores
-smiles: '*CCO*'                                       # the SMILES used for visualization when task=='pretrain'
+task: 'finetune'                                      # the task to visualize the attention scores
+smiles: '1.0$0.0$0.0$0.0$102.0316941$0.0$0.0$0.0$0.0024655$25.0$CC1COC(=O)O1$CC[N+](CC)(CC)CC.C(F)(F)(F)S(=O)(=O)[O-]'                                       # the SMILES used for visualization when task=='pretrain'
 layer: 0                                              # the hidden layer for visualization when task=='pretrain'
 index: 8                                              # the index of the sequence used for visualization when task=='finetune'
 add_vocab_flag: False                                 # whether to add supplementary vocab
 
-file_path: 'data/PE_II.csv'                           # train file path
-vocab_sup_file: 'data/vocab_sup_PE_II.csv'            # supplementary vocab file path
-model_path: 'ckpt/PE_II_best_model.pt'                # finetuned model path
+file_path: 'data/train_liq.csv'                           # train file path
+vocab_sup_file: 'data/vocab/vocab_sup_PE_I.csv'            # supplementary vocab file path
+model_path: 'ckpt/liq_2_best_model.pt'                # finetuned model path
 pretrain_path: 'ckpt/pretrain.pt'                     # pretrained model path
-save_path: 'figs/attention_vis.png'                   # figure save path
+save_path: 'figs/attention_vis_finetune_with_exp.png'                   # figure save path
 blocksize: 7                                          # max length of sequences after tokenization
 
 figsize_x: 30                                         # the size of figure in x

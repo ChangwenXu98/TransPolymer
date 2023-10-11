@@ -10,8 +10,8 @@ vocab_sup_file: 'data/vocab/vocab_sup_PE_I.csv'           # supplementary vocab 
 train_file: 'data/train_liq.csv'                   # train file path
 test_file: 'data/test_liq.csv'                     # test file path if cross-validation is not used
 model_path: 'ckpt/pretrain.pt'                      # pretrain model path
-save_path: 'ckpt/liq_3_train.pt'                     # checkpoint path
-best_model_path: 'ckpt/liq_3_best_model.pt'          # best model save path
+save_path: 'ckpt/old_train.pt'                     # checkpoint path
+best_model_path: 'ckpt/old_best_model.pt'          # best model save path
 
 k: 5                                                # k-fold cross-validation
 blocksize: 411                                      # max length of sequences after tokenization

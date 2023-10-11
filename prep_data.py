@@ -59,9 +59,8 @@ def exp_3(num_file, smiles_file, output_file):
     df_input_final.to_csv(output_file, index = False)
 
 
-
 def main():
-    exp_3("./data/val_multi_comp_add.csv", "./data/val_multi_comp_comb.csv", "./data/val_liq.csv")
+    exp_3("./data/freqI_test_multi_comp_add.csv", "./data/freqI_test_multi_comp_comb.csv", "./data/freqI_test.csv")
 
 if __name__ == "__main__":
     main()

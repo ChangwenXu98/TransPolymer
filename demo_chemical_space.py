@@ -88,5 +88,5 @@ interactive_map = figure(width=1000, height=1000, tools=['reset,box_zoom,wheel_z
 
 interactive_map.circle('x', 'y', size=5, source=source, fill_alpha=0.2);
 
-output_file("interactive_map.html")
+output_file("interactive_map_2.html")
 save(interactive_map)

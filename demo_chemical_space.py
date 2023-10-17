@@ -72,12 +72,14 @@ source = ColumnDataSource(data=dict(x=tsne[:,0], y=tsne[:,1], svgs_salt=svgs_sal
 
 hover = HoverTool(tooltips="""
     <div>
-        <div> Salt: @svgs_salt{safe}
+        <div> 
+            <span style="font-size: 17px; font-weight: bold;"> Salt @svgs_salt{safe} </span>
         </div>
-        <div> Solvent: @svgs_solv{safe}
+        <div> 
+            <span style="font-size: 17px; font-weight: bold;"> Solvent @svgs_solv{safe} </span>
         </div>
         <div>
-            <span style="font-size: 17px; font-weight: bold;"> Conductivity: @desc</span>
+            <span style="font-size: 17px; font-weight: bold;"> Conductivity @desc </span>
         </div>
     </div>
     """

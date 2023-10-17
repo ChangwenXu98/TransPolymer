@@ -68,14 +68,13 @@ svgs_solv = [moltosvg(m).data for m in df.solv]
 ChangeMoleculeRendering(renderer='PNG')
 
 
-source = ColumnDataSource(data=dict(x=tsne[:,0], y=tsne[:,1], svgs_salt=svgs_salt))
+source = ColumnDataSource(data=dict(x=tsne[:,0], y=tsne[:,1], svgs_salt=svgs_salt, svgs_solv=svgs_solv))
 
 hover = HoverTool(tooltips="""
     <div>
         <div>@svgs_salt{safe}
         </div>
-        <div>
-            <span style="font-size: 17px; font-weight: bold;">@desc</span>
+        <div>@svgs_solv{safe}
         </div>
     </div>
     """

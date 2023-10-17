@@ -72,7 +72,9 @@ source = ColumnDataSource(data=dict(x=tsne[:,0], y=tsne[:,1], svgs_salt=svgs_sal
 
 hover = HoverTool(tooltips="""
     <div>
-        <div>@svgs{safe}
+        <div>@svgs_salt{safe}
+        </div>
+        <div>@svgs_solv{safe}
         </div>
         <div>
             <span style="font-size: 17px; font-weight: bold;">@desc</span>

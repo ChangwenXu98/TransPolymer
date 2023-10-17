@@ -474,7 +474,7 @@ if __name__ == "__main__":
     if finetune_config['model_indicator'] == 'pretrain':
         print("Use the pretrained model")
         PretrainedModel = RobertaModel.from_pretrained(finetune_config['model_path'])
-        tokenizer = PolymerSmilesTokenizer.from_pretrained("/project/rcc/hyadav/ChemBERTa-77M-MTR", max_len=finetune_config['blocksize'])
+        tokenizer = PolymerSmilesTokenizer.from_pretrained("/project/rcc/hyadav/roberta-base", max_len=finetune_config['blocksize'])
         PretrainedModel.config.hidden_dropout_prob = finetune_config['hidden_dropout_prob']
         PretrainedModel.config.attention_probs_dropout_prob = finetune_config['attention_probs_dropout_prob']
     else:
@@ -489,7 +489,7 @@ if __name__ == "__main__":
             attention_probs_dropout_prob=0.1
         )
         PretrainedModel = RobertaModel(config=config)
-        tokenizer = RobertaTokenizer.from_pretrained("/project/rcc/hyadav/ChemBERTa-77M-MTR", max_len=finetune_config['blocksize'])
+        tokenizer = RobertaTokenizer.from_pretrained("/project/rcc/hyadav/roberta-base", max_len=finetune_config['blocksize'])
     max_token_len = finetune_config['blocksize']
 
     """Run the main function"""

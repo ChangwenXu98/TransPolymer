@@ -35,6 +35,8 @@ writer = SummaryWriter()
 
 import pdb
 
+from colorama import init, Fore, Style
+
 class DownstreamRegression(nn.Module):
     def __init__(self, drop_rate=0.1):
         super(DownstreamRegression, self).__init__()
@@ -110,6 +112,7 @@ def main(attention_config):
                 cbar.ax.tick_params(labelsize=attention_config['labelsize'])
 
     else:
+        # pdb.set_trace()
         yticklabels = ['Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6']
         for i in range(3):
             for j in range(4):
@@ -119,6 +122,9 @@ def main(attention_config):
                         attention_CLS = attention_sub
                     else:
                         attention_CLS = np.vstack((attention_CLS, attention_sub))
+                max_attention_CLS = attention_CLS.max(axis = 0)
+                max_attention= np.vstack(max_attention_CLS.reshape(1,max_attention_CLS.shape[0]))
+                # pdb.set_trace()
                 sns.heatmap(attention_CLS, ax = axes[i,j], xticklabels=False)
                 axes[i, j].set_title(label="Attention Head %s" % str(4 * i + j + 1), fontsize=attention_config['fontsize'])
                 axes[i, j].set_yticklabels(rotation=attention_config['rotation'], labels=yticklabels)
@@ -127,6 +133,23 @@ def main(attention_config):
                 # here set the labelsize by 20
                 cbar.ax.tick_params(labelsize=attention_config['labelsize'])
     plt.savefig(attention_config['save_path'], bbox_inches='tight')
+    # max_array = max_attention.max(axis = 0)
+    
+    # # Define color mappings based on float ranges (you can customize these)
+    # def get_color(float_value):
+    #     if float_value < 0.3:
+    #         return Fore.RED
+    #     elif float_value < 0.7:
+    #         return Fore.GREEN
+    #     else:
+    #         return Fore.BLUE
+    
+    # colorized_string = ''.join([get_color(value) + char for value, char in zip(max_array, smiles)])
+
+    # print(colorized_string)
+
+    # pdb.set_trace()
+
 
 if __name__ == "__main__":
 

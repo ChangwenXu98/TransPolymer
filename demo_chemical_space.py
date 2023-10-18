@@ -92,7 +92,7 @@ interactive_map = figure(width=1000, height=1000, tools=['reset,box_zoom,wheel_z
 
 
 #Use the field name of the column source
-mapper = linear_cmap(field_name= conductivity_values , palette=Turbo256 ,low=min(conductivity_values) ,high=max(conductivity_values))
+mapper = linear_cmap(field_name = 'desc' , palette=Turbo256 ,low=min(conductivity_values) ,high=max(conductivity_values))
 
 # pdb.set_trace()
 

@@ -103,5 +103,5 @@ mapper = linear_cmap(field_name = 'desc' , palette=Turbo256 ,low=min(conductivit
 interactive_map.circle('x', 'y', line_color=mapper, color=mapper, size=12, source=source, fill_alpha=0.2)
 color_bar = ColorBar(color_mapper=mapper['transform'], width=8)
 interactive_map.add_layout(color_bar, 'right')
-output_file("interactive_map_gradients.html")
+output_file("interactive_map_gradients_new.html")
 save(interactive_map)

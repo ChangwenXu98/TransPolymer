@@ -100,8 +100,8 @@ mapper = linear_cmap(field_name = 'desc' , palette=Turbo256 ,low=min(conductivit
 
 # pdb.set_trace()
 
-interactive_map.circle('x', 'y', line_color=mapper, color=mapper, size=7, source=source, fill_alpha=0.2)
+interactive_map.circle('x', 'y', line_color=mapper, color=mapper, size=6, source=source, fill_alpha=0.2)
 color_bar = ColorBar(color_mapper=mapper['transform'], width=8)
 interactive_map.add_layout(color_bar, 'right')
-output_file("interactive_map_gradients_new.html")
+output_file("interactive_map_gradients_6.html")
 save(interactive_map)

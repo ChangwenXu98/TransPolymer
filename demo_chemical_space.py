@@ -90,13 +90,12 @@ hover = HoverTool(tooltips="""
 )
 interactive_map = figure(width=1000, height=1000, tools=['reset,box_zoom,wheel_zoom,zoom_in,zoom_out,pan',hover], title="Liquid Electrolytes (ECFP4)")
 
-
 #Use the field name of the column source
 mapper = linear_cmap(field_name = 'desc' , palette=Turbo256 ,low=min(conductivity_values) ,high=max(conductivity_values))
 
 # pdb.set_trace()
 
-interactive_map.circle('x', 'y', line_color=mapper, color=mapper, size=10, source=source, fill_alpha=0.2)
+interactive_map.circle('x', 'y', line_color=mapper, color=mapper, size=12, source=source, fill_alpha=0.2)
 color_bar = ColorBar(color_mapper=mapper['transform'], width=8)
 interactive_map.add_layout(color_bar, 'right')
 output_file("interactive_map_gradients.html")

@@ -88,14 +88,19 @@ hover = HoverTool(tooltips="""
     </div>
     """
 )
-interactive_map = figure(width=1000, height=1000, tools=['reset,box_zoom,wheel_zoom,zoom_in,zoom_out,pan',hover], title="Liquid Electrolytes (ECFP4)")
+interactive_map = figure(width=1000, height=1000, tools=['reset,box_zoom,wheel_zoom,zoom_in,zoom_out,pan',hover])
+
+interactive_map.title.text = "Liquid Electrolytes (ECFP4)"
+interactive_map.title.align = "center"
+interactive_map.title.text_color = "orange"
+interactive_map.title.text_font_size = "25px"
 
 #Use the field name of the column source
 mapper = linear_cmap(field_name = 'desc' , palette=Turbo256 ,low=min(conductivity_values) ,high=max(conductivity_values))
 
 # pdb.set_trace()
 
-interactive_map.circle('x', 'y', line_color=mapper, color=mapper, size=20, source=source, fill_alpha=0.2)
+interactive_map.circle('x', 'y', line_color=mapper, color=mapper, size=12, source=source, fill_alpha=0.2)
 color_bar = ColorBar(color_mapper=mapper['transform'], width=8)
 interactive_map.add_layout(color_bar, 'right')
 output_file("interactive_map_gradients.html")

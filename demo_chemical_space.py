@@ -18,9 +18,11 @@ from rdkit.Chem.PandasTools import ChangeMoleculeRendering
 #Bokeh library for plotting
 import json
 from bokeh.plotting import figure, show, output_notebook, ColumnDataSource
-from bokeh.models import HoverTool
+from bokeh.models import HoverTool, ColorBar
 from bokeh.transform import factor_cmap
 from bokeh.plotting import figure, output_file, save
+from bokeh.transform import linear_cmap
+from bokeh.palettes import Turbo256
 output_notebook()
 
 import pdb
@@ -68,7 +70,9 @@ svgs_solv = [moltosvg(m).data for m in df.solv]
 ChangeMoleculeRendering(renderer='PNG')
 
 
-source = ColumnDataSource(data=dict(x=tsne[:,0], y=tsne[:,1], svgs_salt=svgs_salt, svgs_solv=svgs_solv, desc= df.conductivity_log))
+conductivity_values = df['conductivity_log'].values.tolist()
+
+source = ColumnDataSource(data=dict(x=tsne[:,0], y=tsne[:,1], svgs_salt=svgs_salt, svgs_solv=svgs_solv, desc= conductivity_values))
 
 hover = HoverTool(tooltips="""
     <div>
@@ -86,7 +90,14 @@ hover = HoverTool(tooltips="""
 )
 interactive_map = figure(width=1000, height=1000, tools=['reset,box_zoom,wheel_zoom,zoom_in,zoom_out,pan',hover], title="Liquid Electrolytes (ECFP4)")
 
-interactive_map.circle('x', 'y', size=5, source=source, fill_alpha=0.2);
 
-output_file("interactive_map_2.html")
+#Use the field name of the column source
+mapper = linear_cmap(field_name= conductivity_values , palette=Turbo256 ,low=min(conductivity_values) ,high=max(conductivity_values))
+
+# pdb.set_trace()
+
+interactive_map.circle('x', 'y', line_color=mapper, color=mapper, size=5, source=source, fill_alpha=0.2)
+color_bar = ColorBar(color_mapper=mapper['transform'], width=8)
+interactive_map.add_layout(color_bar, 'right')
+output_file("interactive_map_gradients.html")
 save(interactive_map)

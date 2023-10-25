@@ -75,7 +75,7 @@ def exp_4(num_file, smiles_file, output_file):
 
 
 def main():
-    exp_4("./data/freqII_val_multi_comp_add.csv", "./data/freqII_val_multi_comp.csv", "./data/freqII_val_new.csv")
+    exp_3("./data/freqII_val_multi_comp_add.csv", "./data/freqII_val_multi_comp_comb.csv", "./data/freqII_val.csv")
 
 if __name__ == "__main__":
     main()

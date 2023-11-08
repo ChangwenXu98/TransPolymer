@@ -1,4 +1,4 @@
-CV_flag: False                                    # whether to use cross-validation
+CV_flag: False                                      # whether to use cross-validation
 add_vocab_flag: True                             # whether to add supplementary vocab
 LLRD_flag: False                                    # whether to use layer-wise lr decay
 aug_flag: False                                     # whether to apply data augmentation
@@ -7,11 +7,11 @@ model_indicator: 'pretrain'                        # whether to use pretrained m
 aug_indicator:                                     # number of augmentation per SMILES. If no limitation, assign the indicator with None (leave it blank).
 
 vocab_sup_file: 'data/vocab/vocab_sup_PE_I.csv'           # supplementary vocab file path
-train_file: 'data/freqII_train.csv'                   # train file path
-test_file: 'data/freqII_test.csv'                     # test file path if cross-validation is not used
+train_file: 'data/freqII_train_all_pipe.csv'                  # train file path
+test_file: 'data/freqII_test_all_pipe.csv'                     # test file path if cross-validation is not used
 model_path: 'ckpt/pretrain.pt'                      # pretrain model path
-save_path: 'ckpt/freqII_train_old_vocab.pt'                     # checkpoint path
-best_model_path: 'ckpt/freqII_train_old_vocab_best_model.pt'          # best model save path
+save_path: 'ckpt/freqII_train_all_pipe_old_vocab.pt'                     # checkpoint path
+best_model_path: 'ckpt/freqII_train_all_pipe_old_vocab_best_model.pt'          # best model save path
 
 k: 5                                                # k-fold cross-validation
 blocksize: 411                                      # max length of sequences after tokenization
@@ -25,6 +25,4 @@ weight_decay: 0.01
 hidden_dropout_prob: 0.1                            # hidden layer dropout
 attention_probs_dropout_prob: 0.1                   # attention dropout
 tolerance: 5                                        # tolerance of no improvement in performance before early stop
-num_workers: 8                                      # number of workers when loading data
-
-
+num_workers: 8         

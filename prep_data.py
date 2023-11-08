@@ -3,30 +3,24 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import pdb
 
-def exp_1():
-    df = pd.read_csv("./data/all_multi_comp_comb.csv")
-    df_2 = df[['conductivity_log']].copy()
-    df_2['input'] = df[['solv_comb_sm', 'salt_sm']].apply("$".join, axis=1)
-    cols = df_2.columns.tolist()
-    cols = cols[-1:] + cols[:-1]
-    df_2 = df_2[cols]
-    print(df_2.shape[0])
-    df_3 = pd.read_csv("./data/all_multi_comp_add.csv")
-    
-    
-    df_2.insert(1, "temperature", df_3["temperature"].tolist(), True)
-    df_2['temperature'] = df_2['temperature'].astype(str)
-    df_2['input'] = df_2[['input', 'temperature']].apply("$".join, axis=1)
-    df_2 = df_2.drop("temperature", axis = 1)
+def only_smiles(smiles_file, output_file):
+    df_smiles = pd.read_csv(smiles_file)
+    df_smiles.fillna('NAN_SMILES', inplace=True)
+    df_input_final = pd.DataFrame()
+    df_input_final['input'] = df_smiles[['solv_comb_sm', 'salt_sm']].apply("|".join, axis=1)
+    df_input_final['conductivity_log'] = df_smiles['conductivity_log']
+    df_input_final.to_csv(output_file, index = False)
 
-    print(df_2)
-
-    train, test = train_test_split(df_2, test_size=0.2)
-
-    print(train.shape[0], test.shape[0])
-
-    train.to_csv("./data/our_train.csv", index = False)
-    test.to_csv("./data/our_test.csv", index = False)
+def smiles_and_temp(num_file, smiles_file, output_file):
+    df_smiles = pd.read_csv(smiles_file)
+    df_num = pd.read_csv(num_file)
+    df_smiles.fillna('NAN_SMILES', inplace=True)
+    df_input = pd.concat([df_num, df_smiles], axis = 1)
+    df_input = df_input.applymap(str)
+    df_input_final = pd.DataFrame()
+    df_input_final['input'] = df_input[['solv_comb_sm', 'salt_sm', 'temperature']].apply("|".join, axis=1)
+    df_input_final['conductivity_log'] = df_smiles['conductivity_log']
+    df_input_final.to_csv(output_file, index = False)
 
 def exp_2():
     df_num = pd.read_csv("./data/all_multi_comp_add.csv")
@@ -53,7 +47,7 @@ def exp_3(num_file, smiles_file, output_file):
     df_input = pd.concat([df_num, df_smiles], axis = 1)
     df_input = df_input.applymap(str)
     df_input_final = pd.DataFrame()
-    df_input_final['input'] = df_input[['solv_ratio_1', 'solv_ratio_2', 'solv_ratio_3', 'solv_ratio_4', 'mol_wt_solv_1', 'mol_wt_solv_2', 'mol_wt_solv_3', 'mol_wt_solv_4', 'conc_salt', 'temperature', 'solv_comb_sm', 'salt_sm']].apply("$".join, axis=1)
+    df_input_final['input'] = df_input[['solv_ratio_1', 'solv_ratio_2', 'solv_ratio_3', 'solv_ratio_4', 'mol_wt_solv_1', 'mol_wt_solv_2', 'mol_wt_solv_3', 'mol_wt_solv_4', 'conc_salt', 'temperature', 'solv_comb_sm', 'salt_sm']].apply("|".join, axis=1)
     df_input_final['conductivity_log'] = df_input['conductivity_log']
     df_input_final.to_csv(output_file, index = False)
 
@@ -75,7 +69,7 @@ def exp_4(num_file, smiles_file, output_file):
 
 
 def main():
-    exp_3("./data/freqII_val_multi_comp_add.csv", "./data/freqII_val_multi_comp_comb.csv", "./data/freqII_val.csv")
+    exp_3( "./data/freqII_train_multi_comp_add.csv", "./data/freqII_train_multi_comp_comb.csv", "./data/freqII_train_all_pipe.csv")
 
 if __name__ == "__main__":
     main()

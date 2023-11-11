@@ -1,10 +1,11 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import pandas as pd
 import numpy as np
 import sys
 import yaml
-
 from tqdm.auto import tqdm
-
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
@@ -36,6 +37,11 @@ writer = SummaryWriter()
 from copy import deepcopy
 
 np.random.seed(seed=1)
+
+"""
+Check if PyTorch is using GPU
+"""
+print(torch.cuda.is_available(), torch.cuda.device_count(), torch.cuda.current_device())
 
 """Layer-wise learning rate decay"""
 

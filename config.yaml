@@ -1,4 +1,4 @@
-file_path: 'data/pretrain.csv'          # pretrain data path
+file_path: 'data/pretrain_50k.csv'          # pretrain data path
 
 epochs: 30                              # total number of epochs
 batch_size: 100                         # batch size
